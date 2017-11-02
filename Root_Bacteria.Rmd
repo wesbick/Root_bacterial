@@ -163,7 +163,7 @@ quartz.options(height=5, width=5)
 plot.new() 
 par(oma = c(1, 1, 1, 1))
 par(mar = c( 2, 3, 0.5, 9 ))
-plot.window(xlim = c(-0.5,0.5), ylim = c(-0.5,0.5))
+plot.window(xlim = c(-0.3,0.3), ylim = c(-0.3,0.3))
 axis(side = 1)
 axis(side = 2, las = 1)
 points(x = NMDS_scores$NMDS1, y = NMDS_scores$NMDS2, pch = pchs[as.character(meta_alpha$Lineage)], 
@@ -189,6 +189,13 @@ legend(0.54,0.54, legend_text, pch = 16,
 legend_text2 <- c("Native", "Non-Native")
 legend("bottomright", legend_text2, pch = c(1,16), pt.lwd = 2, pt.cex = 1.5, xpd = T)
 box()
+
+```
+
+```{r simper, include = T, echo = F}
+simp <- simper(shared, meta_alpha$Lineage)
+summary(simp, ordered = T)
+simp
 
 ```
 
@@ -1220,6 +1227,18 @@ box()
 
 
 ```
+##Function
+#From Picrust
+
+```{r functional assessment, echo = F, include = T}
+fungenes <- read.table("data/picrust_assessments.csv", header = T, sep = ",", stringsAsFactors = F)
+
+fungenes <- t(fungenes)
+fungenes <- fungenes[-1, ]
+
+funperm <- adonis(fungenes ~ Site * Lineage + Sat_lev, data = meta_alpha)
+funperm
+```
 
 ## Nutrients
 ### Soil Nutrients
@@ -1438,5 +1457,15 @@ perm_tisnutrient <- adonis(shared_tisfinite ~ X15TisN * X15TisP, data = tisma_fi
 perm_tisnutrient
 ```
 
+```{r picrust, echo = F, include=F}
+pishared <- read.table(file= "data/picrust_table.csv", header = T, stringsAsFactors = F, sep = ",", row.names = 1)
 
+pishared <- t(pishared)
+meta_alpha$Site <- as.factor(meta_alpha$Site)
+meta_alpha$Lineage <- as.factor(meta_alpha$Lineage)
+
+permpi <- adonis(pishared ~ Site * Lineage + Sat_lev, data=meta_alpha, method = "bray")
+permpi
+
+```
 
