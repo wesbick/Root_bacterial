@@ -40,6 +40,28 @@ tax_table <- function(table, database){
     
     otu_table <- data.frame(otu = taxonomy$OTU, kingdom = kingdom, phylum = phylum, class = class, order = order, family = family, genus = genus, stringsAsFactors = F)
     
+  }else if(database == "GG"){
+    taxnocon <- gsub(pattern = "\\(\\d*\\)", replacement = "", x=gg_tax$Taxonomy)
+    
+    k_re <- "[k_]+(\\w+);.*"
+    kingdom <- gsub(pattern = k_re, "\\1", taxnocon) 
+    p_re <- "[k_]+\\w+;[kp_]*\\[?(\\w+)\\]?;.*"
+    phylum <- gsub(pattern = p_re, "\\1", taxnocon)  
+    c_re <- "[k_]+\\w+;[kp_]*\\w+;[kpc_]*\\[?(\\w+)\\]?;.*"
+    class <- gsub(pattern = c_re, "\\1", taxnocon) 
+    o_re <- "[k_]+\\w+;[kp_]*\\w+;[kpc_]*\\w+;[kpco_]*\\[?(\\w+)\\]?;.*"
+    order <- gsub(pattern = o_re, "\\1", taxnocon)
+    f_re <- "[k_]+\\w+;[kp_]*\\w+;[kpc_]*\\w+;[kpco_]*\\w+;[kpcof_]*\\[?(\\w+)\\]?;.*"
+    family <- gsub(pattern = f_re, "\\1", taxnocon)
+    g_re <- "[k_]+\\w+;[kp_]*\\w+;[kpc_]*\\w+;[kpco_]*\\w+;[kpcof_]*\\w+;[kpcofg_]*\\[?(\\w+)\\]?;.*"
+    genus <- gsub(pattern = g_re, "\\1", taxnocon)
+    sp_re <- "[k_]+\\w+;[kp_]*\\w+;[kpc_]*\\w+;[kpco_]*\\w+;[kpcof_]*\\w+;[kpcofg_]*\\w+;[kpcofgs_]*(\\w+-*\\w*);.*"
+    sp <- gsub(pattern = sp_re, "\\1", taxnocon)
+    s_re <- "(\\w+)_(\\w+-*\\w*)"
+    species <- gsub(pattern = s_re, "\\2", sp)
+    
+    otu_table <- data.frame(otu = taxonomy$OTU, kingdom = kingdom, phylum = phylum, class = class, order = order, family = family, genus = genus, species = species, stringsAsFactors = F)
+    
   }
   num_otus <- length(otu_table$otu)
   rel_kingdom <- (table(otu_table$kingdom)/num_otus)*100
